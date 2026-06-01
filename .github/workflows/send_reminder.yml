@@ -1,0 +1,29 @@
+name: Send Reminder
+
+on:
+  schedule:
+    - cron: '0 10 25 * *'  
+  workflow_dispatch:
+
+jobs:
+  send_reminder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install firebase-admin axios
+
+      - name: Send reminders
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
+        run: node scripts/send_reminder.js
