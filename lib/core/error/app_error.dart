@@ -1,4 +1,4 @@
-abstract class AppError {
+class AppError {
   final String message;
   const AppError(this.message);
 
