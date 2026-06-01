@@ -1,20 +1,21 @@
 import 'package:get_it/get_it.dart';
 import 'package:sadaqa_app/core/services/auth/firebase_auth_servide.dart';
+import 'package:sadaqa_app/core/services/fcm%20service/local_notification_service.dart';
 import 'package:sadaqa_app/core/services/fireStore/user_service.dart';
 import 'package:sadaqa_app/core/services/fireStore/group_service.dart';
 import 'package:sadaqa_app/core/services/fireStore/membership_service.dart';
 import 'package:sadaqa_app/core/services/fireStore/contribution_service.dart';
 import 'package:sadaqa_app/features/auth/data/data source/auth_ds.dart';
-import 'package:sadaqa_app/features/auth/data/repos/auth_repo.dart';
-import 'package:sadaqa_app/features/auth/data/repos/auth_repo_impl.dart';
 import 'package:sadaqa_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:sadaqa_app/features/group/data/data source/group_ds.dart';
-import 'package:sadaqa_app/features/group/data/repo/group-repo.dart';
-import 'package:sadaqa_app/features/group/data/repo/group_repo_impl.dart';
 import 'package:sadaqa_app/features/group/presentation/manager/group_cubit.dart';
 import 'package:sadaqa_app/features/membership/data/data%20source/membership_ds.dart';
 import 'package:sadaqa_app/features/membership/data/repo/member_ship_repo_impl.dart';
 import 'package:sadaqa_app/features/membership/data/repo/membership_repo.dart';
+import 'package:sadaqa_app/features/auth/data/repos/auth_repo.dart';
+import 'package:sadaqa_app/features/group/data/repo/group-repo.dart';
+import 'package:sadaqa_app/features/auth/data/repos/auth_repo_impl.dart';
+import 'package:sadaqa_app/features/group/data/repo/group_repo_impl.dart';
 import 'package:sadaqa_app/features/membership/presentation/manager/membership_cubit.dart';
 import 'package:sadaqa_app/features/monthly_donation/data/data%20source/contribution_ds.dart';
 import 'package:sadaqa_app/features/monthly_donation/data/repo/contribution-repo_impl.dart';
@@ -30,6 +31,7 @@ void setupLocator() {
   get.registerLazySingleton(() => GroupService());
   get.registerLazySingleton(() => MembershipService());
   get.registerLazySingleton(() => ContributionService());
+  get.registerLazySingleton(() => LocalNotificationService());
 
   // ─── Data Sources ────────────────────────────────────────
   get.registerLazySingleton(
