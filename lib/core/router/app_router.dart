@@ -1,19 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sadaqa_app/core/dependancy%20injection/di.dart';
+import 'package:sadaqa_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:sadaqa_app/features/auth/presentation/views/login_view.dart';
 import 'package:sadaqa_app/features/auth/presentation/views/signup.dart';
+import 'package:sadaqa_app/features/group/presentation/views/home_view.dart';
 
 class AppRouter {
   static const kSpalshview = '/spalsh';
   static const kLoginview = '/login';
   static const kSignupview = '/signup';
+  static const home = '/home';
   final GoRouter router = GoRouter(
     routes: [
-    
-       GoRoute(path: '/', builder: (context, state) => LoginView()),
-       GoRoute(path: '/login', builder: (context, state) => LoginView()),
-      GoRoute(path: '/spalsh', builder: (context, state) => Center()),
-      GoRoute(path: '/signup', builder: (context, state) => SignupView()),
+       GoRoute(path: '/', builder: (context, state) => BlocProvider(
+        create: (BuildContext context) =>get<AuthCubit>(), 
+        child: SignupView())),
+        GoRoute(path: '/spalsh', builder: (context, state) => Center()),
+       GoRoute
+       (
+        path: '/login', 
+       builder: (context, state) => BlocProvider
+       (
+        create: (BuildContext context) =>get<AuthCubit>(),     
+       child: LoginView())
+       ),
+     
+      GoRoute(path: '/signup', builder: (context, state) => BlocProvider(
+        create: (BuildContext context) =>get<AuthCubit>(), 
+        child: SignupView())),
+
+          GoRoute(path: '/home', builder: (context, state) =>UserGroupsView() ),
     ],
   );
 }

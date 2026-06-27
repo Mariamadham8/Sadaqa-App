@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sadaqa_app/core/router/app_router.dart';
 import 'package:sadaqa_app/core/utils/app_colors.dart';
@@ -6,6 +7,7 @@ import 'package:sadaqa_app/core/utils/app_fonts.dart';
 import 'package:sadaqa_app/core/utils/validators.dart';
 import 'package:sadaqa_app/core/widgets/custom_button.dart';
 import 'package:sadaqa_app/core/widgets/custom_input_field.dart';
+import 'package:sadaqa_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:sadaqa_app/features/auth/presentation/widgets/auth_header.dart';
 import 'package:sadaqa_app/features/auth/presentation/widgets/ordivider.dart';
 
@@ -39,11 +41,14 @@ class _LoginViewState extends State<LoginView> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    // TODO: call AuthCubit.login(_emailController.text, _passwordController.text)
+    await context.read<AuthCubit>().signInWithEmail(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
     await Future.delayed(const Duration(seconds: 2)); // remove when wiring cubit
 
     setState(() => _isLoading = false);
-    // TODO: context.go('/home')
+    context.pushReplacement(AppRouter.home);
   }
 
   @override
@@ -109,11 +114,18 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(height: 28),
 
                 // ── Login button ───────────────────────────────────────────
-                AppButton(
-                  label: 'Sign In',
-                  isLoading: _isLoading,
-                  onPressed: _onLoginPressed,
-
+                BlocListener<AuthCubit, AuthState>(
+                  listener: (context, state) {
+                    if (state is AuthAuthenticated) {
+                      context.pushReplacement(AppRouter.home);
+                    }
+                  },
+                  child: AppButton(
+                    label: 'Sign In',
+                    isLoading: _isLoading,
+                    onPressed: _onLoginPressed,
+                  
+                  ),
                 ),
                 const SizedBox(height: 32),
 

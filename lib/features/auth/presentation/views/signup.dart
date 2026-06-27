@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sadaqa_app/core/router/app_router.dart';
 import 'package:sadaqa_app/core/utils/app_colors.dart';
@@ -6,6 +7,7 @@ import 'package:sadaqa_app/core/utils/app_fonts.dart';
 import 'package:sadaqa_app/core/utils/validators.dart';
 import 'package:sadaqa_app/core/widgets/custom_button.dart';
 import 'package:sadaqa_app/core/widgets/custom_input_field.dart';
+import 'package:sadaqa_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:sadaqa_app/features/auth/presentation/widgets/auth_header.dart';
 
 class SignupView extends StatefulWidget {
@@ -60,11 +62,15 @@ class _SignupViewState extends State<SignupView> {
 
     setState(() => _isLoading = true);
 
-    // TODO: call AuthCubit.signup(name, email, password)
+    context.read<AuthCubit>().signUpWithEmail(
+      name: _nameController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
     await Future.delayed(const Duration(seconds: 2)); // remove when wiring cubit
 
     setState(() => _isLoading = false);
-    // TODO: context.go('/home')
+    context.pushReplacement(AppRouter.home);
   }
 
   @override
@@ -150,11 +156,20 @@ class _SignupViewState extends State<SignupView> {
 
                
                 // ── Signup button ──────────────────────────────────────────
-                AppButton(
-                  label: 'Create Account',
-                  isLoading: _isLoading,
-                  onPressed: _onSignupPressed,
+                BlocListener<AuthCubit, AuthState>(
+                  listener: (context, state) {
+                    if (state is AuthAuthenticated) {
+                      context.pushReplacement(AppRouter.home);
+                    }
+                  },
+                  child: AppButton(
+                    label: 'Create Account',
+                    isLoading: _isLoading,
+                    onPressed: _onSignupPressed,
+                  ),
                 ),
+                  
+                
                 const SizedBox(height: 32),
 
                 // ── Login link ─────────────────────────────────────────────
@@ -195,4 +210,3 @@ class _SignupViewState extends State<SignupView> {
     );
   }
 }
-
