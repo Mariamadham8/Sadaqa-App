@@ -42,7 +42,7 @@ class _UserGroupsViewBodyState extends State<UserGroupsViewBody> {
       floatingActionButton: CreateGroupFab(
         onTap: () => _openAddGroupDialog(context),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

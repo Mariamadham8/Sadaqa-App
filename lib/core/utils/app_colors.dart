@@ -5,6 +5,7 @@ abstract class AppColors {
   static const Color primary = Color(0xFF1DB954);
   static const Color primaryLight = Color(0xFFE8F8F0);
   static const Color primaryDark = Color(0xFF0F6E56);
+  static const Color scaffold = Color(0xFFF5F7F6);
 
   // Gold / Pending
   static const Color gold = Color(0xFFE8A020);

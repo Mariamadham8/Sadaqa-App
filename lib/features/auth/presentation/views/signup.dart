@@ -1,0 +1,198 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sadaqa_app/core/router/app_router.dart';
+import 'package:sadaqa_app/core/utils/app_colors.dart';
+import 'package:sadaqa_app/core/utils/app_fonts.dart';
+import 'package:sadaqa_app/core/utils/validators.dart';
+import 'package:sadaqa_app/core/widgets/custom_button.dart';
+import 'package:sadaqa_app/core/widgets/custom_input_field.dart';
+import 'package:sadaqa_app/features/auth/presentation/widgets/auth_header.dart';
+
+class SignupView extends StatefulWidget {
+  const SignupView({super.key});
+
+  @override
+  State<SignupView> createState() => _SignupViewState();
+}
+
+class _SignupViewState extends State<SignupView> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  final _nameFocus = FocusNode();
+  final _emailFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+  final _confirmPasswordFocus = FocusNode();
+
+  bool _isLoading = false;
+  bool _agreedToTerms = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _nameFocus.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmPasswordFocus.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onSignupPressed() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (!_agreedToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please agree to the Terms & Privacy Policy'),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    // TODO: call AuthCubit.signup(name, email, password)
+    await Future.delayed(const Duration(seconds: 2)); // remove when wiring cubit
+
+    setState(() => _isLoading = false);
+    // TODO: context.go('/home')
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.scaffold,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const AuthHeader(
+                  title: 'Create account 🌱',
+                  subtitle:
+                      'Join and start giving with your community.',
+                ),
+                const SizedBox(height: 36),
+
+                // ── Full name ──────────────────────────────────────────────
+                InputField(
+                  controller: _nameController,
+                  focusNode: _nameFocus,
+                  label: 'Full Name',
+                  hint: 'Mariem Hassan',
+                  prefixIcon: Icons.person_outline_rounded,
+                  keyboardType: TextInputType.name,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.name],
+                  onFieldSubmitted: (_) =>
+                      FocusScope.of(context).requestFocus(_emailFocus),
+                  validator: FieldValidators.required( "Full Name"),
+                ),
+                const SizedBox(height: 16),
+
+                // ── Email ──────────────────────────────────────────────────
+                InputField(
+                  controller: _emailController,
+                  focusNode: _emailFocus,
+                  label: 'Email',
+                  hint: 'you@example.com',
+                  prefixIcon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.newUsername],
+                  onFieldSubmitted: (_) =>
+                      FocusScope.of(context).requestFocus(_passwordFocus),
+                  validator: FieldValidators.email,
+                ),
+                const SizedBox(height: 16),
+
+                // ── Password ───────────────────────────────────────────────
+                InputField(
+                  controller: _passwordController,
+                  focusNode: _passwordFocus,
+                  label: 'Password',
+                  hint: '••••••••',
+                  prefixIcon: Icons.lock_outline_rounded,
+                  isPassword: true,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.newPassword],
+                  onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmPasswordFocus),
+                  validator: FieldValidators.password,
+                ),
+                const SizedBox(height: 16),
+
+                // ── Confirm password ───────────────────────────────────────
+                InputField(
+                  controller: _confirmPasswordController,
+                  focusNode: _confirmPasswordFocus,
+                  label: 'Confirm Password',
+                  hint: '••••••••',
+                  prefixIcon: Icons.lock_outline_rounded,
+                  isPassword: true,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.newPassword],
+                  onFieldSubmitted: (_) => _onSignupPressed(),
+                  validator: FieldValidators.confirmPassword(_passwordController.text)
+                ),
+                const SizedBox(height: 20),
+
+               
+                // ── Signup button ──────────────────────────────────────────
+                AppButton(
+                  label: 'Create Account',
+                  isLoading: _isLoading,
+                  onPressed: _onSignupPressed,
+                ),
+                const SizedBox(height: 32),
+
+                // ── Login link ─────────────────────────────────────────────
+                Center(
+                  child: RichText(
+                    text: TextSpan(
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textMuted,
+                    
+                      ),
+                      children: [
+                        const TextSpan(text: 'Already have an account? '),
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.baseline,
+                          baseline: TextBaseline.alphabetic,
+                          child: GestureDetector(
+                            onTap: () {
+                              context.push(AppRouter.kLoginview);
+                            },
+                            child: Text(
+                              'Sign In',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.primary,
+                               
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

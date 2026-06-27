@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:sadaqa_app/core/dependancy%20injection/di.dart';
+import 'package:sadaqa_app/core/router/app_router.dart';
 import 'package:sadaqa_app/core/services/fcm%20service/local_notification_service.dart';
 import 'package:sadaqa_app/features/group/presentation/views/home_view.dart';
 import 'firebase_options.dart';
@@ -21,10 +22,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: AppRouter().router,
       title: 'Sadaqa App',
       debugShowCheckedModeBanner: false,
-      home: const UserGroupsView(),
     );
   }
 }

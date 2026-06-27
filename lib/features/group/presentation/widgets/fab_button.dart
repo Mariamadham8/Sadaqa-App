@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sadaqa_app/core/utils/app_colors.dart';
-import 'package:sadaqa_app/core/utils/app_fonts.dart';
+
 
 class CreateGroupFab extends StatelessWidget {
   const CreateGroupFab({required this.onTap});
@@ -13,7 +13,7 @@ class CreateGroupFab extends StatelessWidget {
       onTap: onTap,
       child: Container(
         height: 52,
-        padding: const EdgeInsets.symmetric(horizontal: 28),
+        width: 52,  
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [AppColors.primary, AppColors.primaryDark],
@@ -29,17 +29,8 @@ class CreateGroupFab extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.add_rounded, color: Colors.white, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              'Create Group',
-              style: AppTextStyles.buttonLarge.copyWith(color: Colors.white),
-            ),
-          ],
-        ),
+        child:  const Icon(Icons.add_rounded, color: Colors.white, size: 30),
+
       ),
     );
   }
