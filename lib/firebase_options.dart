@@ -17,29 +17,17 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -60,5 +48,43 @@ class DefaultFirebaseOptions {
     storageBucket: 'sadaqaapp-9f09c.firebasestorage.app',
     iosClientId: '606289368241-q8ledh28o4lu4nqmfakn5ntki47qv9dk.apps.googleusercontent.com',
     iosBundleId: 'com.example.sadaqaApp',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDLupz91tu5tSfeH1v8fDQI6YWXTS7jEUU',
+    appId: '1:606289368241:web:6fcf5f72d3da3f30a17e90',
+    messagingSenderId: '606289368241',
+    projectId: 'sadaqaapp-9f09c',
+    authDomain: 'sadaqaapp-9f09c.firebaseapp.com',
+    storageBucket: 'sadaqaapp-9f09c.firebasestorage.app',
+    measurementId: 'G-3H6HZWT541',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyDnvRcMAMh4XGcPjSvW6QyJvHCaBR0H6Xo',
+    appId: '1:606289368241:ios:809c17923d96e0e2a17e90',
+    messagingSenderId: '606289368241',
+    projectId: 'sadaqaapp-9f09c',
+    storageBucket: 'sadaqaapp-9f09c.firebasestorage.app',
+    iosClientId: '606289368241-q8ledh28o4lu4nqmfakn5ntki47qv9dk.apps.googleusercontent.com',
+    iosBundleId: 'com.example.sadaqaApp',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyCCmx8lqsfVdmrzc8r0rdPLGXsl49T2Krk',
+    appId: '1:606289368241:android:3cf755b92e936c82a17e90',
+    messagingSenderId: '606289368241',
+    projectId: 'sadaqaapp-9f09c',
+    storageBucket: 'sadaqaapp-9f09c.firebasestorage.app',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyDLupz91tu5tSfeH1v8fDQI6YWXTS7jEUU',
+    appId: '1:606289368241:web:ba4458c8f170cce1a17e90',
+    messagingSenderId: '606289368241',
+    projectId: 'sadaqaapp-9f09c',
+    authDomain: 'sadaqaapp-9f09c.firebaseapp.com',
+    storageBucket: 'sadaqaapp-9f09c.firebasestorage.app',
+    measurementId: 'G-79N74JRGTW',
   );
 }
