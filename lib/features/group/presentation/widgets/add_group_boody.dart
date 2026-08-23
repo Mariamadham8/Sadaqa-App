@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sadaqa_app/core/widgets/custom_button.dart';
@@ -6,7 +7,6 @@ import 'package:sadaqa_app/core/widgets/custom_input_field.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_fonts.dart';
 import '../manager/group_cubit.dart';
-
 
 class AddGroupBoody extends StatefulWidget {
   const AddGroupBoody({super.key});
@@ -74,10 +74,17 @@ class _AddGroupBoodyState extends State<AddGroupBoody> {
       return;
     }
 
-    // TODO: replace with real adminId & adminName from AuthCubit
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You must be logged in to create a group')),
+      );
+      return;
+    }
+
     context.read<GroupCubit>().createGroup(
-      adminId: 'userId',
-      adminName: 'Mariem Adham',
+      adminId: currentUser.uid,
+      adminName: currentUser.displayName ?? 'Unknown',
       name: _nameCtrl.text.trim(),
       monthlyAmount: double.parse(_amountCtrl.text.trim()),
       startDate: _startDate!,
@@ -90,9 +97,11 @@ class _AddGroupBoodyState extends State<AddGroupBoody> {
     return BlocListener<GroupCubit, GroupState>(
       listener: (context, state) {
         if (state is GroupCreated) {
+          final userId = FirebaseAuth.instance.currentUser?.uid;
+          if (userId != null) {
+            context.read<GroupCubit>().loadUserGroups(userId);
+          }
           Navigator.of(context).pop();
-          // refresh the list
-          context.read<GroupCubit>().loadUserGroups('userId');
         }
         if (state is GroupFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -303,4 +312,3 @@ class _FieldLabel extends StatelessWidget {
     );
   }
 }
-

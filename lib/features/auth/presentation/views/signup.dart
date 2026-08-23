@@ -47,6 +47,7 @@ class _SignupViewState extends State<SignupView> {
 
   Future<void> _onSignupPressed() async {
     if (!_formKey.currentState!.validate()) return;
+
     if (!_agreedToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -62,15 +63,19 @@ class _SignupViewState extends State<SignupView> {
 
     setState(() => _isLoading = true);
 
-    context.read<AuthCubit>().signUpWithEmail(
+    // ننادي على signUpWithEmail ونستنى نتيجتها فعلياً بدل ما نكمل على طول.
+    // الـ navigation بقت مسؤولية الـ BlocListener بس، مش هنا،
+    // عشان منعملش pushReplacement قبل ما العملية الحقيقية تخلص
+    // (وده اللي كان بيسبب: Bad state: Cannot emit new states after calling close).
+    await context.read<AuthCubit>().signUpWithEmail(
       name: _nameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text.trim(),
     );
-    await Future.delayed(const Duration(seconds: 2)); // remove when wiring cubit
 
-    setState(() => _isLoading = false);
-    context.pushReplacement(AppRouter.home);
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -86,9 +91,8 @@ class _SignupViewState extends State<SignupView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const AuthHeader(
-                  title: 'Create account 🌱',
-                  subtitle:
-                      'Join and start giving with your community.',
+                  title: 'Create account',
+                  subtitle: 'Join and start giving with your community.',
                 ),
                 const SizedBox(height: 36),
 
@@ -104,7 +108,7 @@ class _SignupViewState extends State<SignupView> {
                   autofillHints: const [AutofillHints.name],
                   onFieldSubmitted: (_) =>
                       FocusScope.of(context).requestFocus(_emailFocus),
-                  validator: FieldValidators.required( "Full Name"),
+                  validator: FieldValidators.required("Full Name"),
                 ),
                 const SizedBox(height: 16),
 
@@ -134,7 +138,8 @@ class _SignupViewState extends State<SignupView> {
                   isPassword: true,
                   textInputAction: TextInputAction.next,
                   autofillHints: const [AutofillHints.newPassword],
-                  onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmPasswordFocus),
+                  onFieldSubmitted: (_) =>
+                      FocusScope.of(context).requestFocus(_confirmPasswordFocus),
                   validator: FieldValidators.password,
                 ),
                 const SizedBox(height: 16),
@@ -150,16 +155,72 @@ class _SignupViewState extends State<SignupView> {
                   textInputAction: TextInputAction.done,
                   autofillHints: const [AutofillHints.newPassword],
                   onFieldSubmitted: (_) => _onSignupPressed(),
-                  validator: FieldValidators.confirmPassword(_passwordController.text)
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please confirm your password';
+                    }
+                    if (value != _passwordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // ── Terms & Privacy ──────────────────────────────────────────
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      value: _agreedToTerms,
+                      activeColor: AppColors.primary,
+                      onChanged: (value) {
+                        setState(() => _agreedToTerms = value ?? false);
+                      },
+                    ),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          style: AppTextStyles.bodyMedium
+                              .copyWith(color: AppColors.textMuted),
+                          children: [
+                            const TextSpan(text: 'I agree to the '),
+                            TextSpan(
+                              text: 'Terms & Privacy Policy',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              // TODO: لو عايزة تفتحي الرابط، ضيفي هنا
+                              // TapGestureRecognizer وربطيها بصفحة/رابط سياسة الخصوصية
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 20),
 
-               
                 // ── Signup button ──────────────────────────────────────────
                 BlocListener<AuthCubit, AuthState>(
                   listener: (context, state) {
                     if (state is AuthAuthenticated) {
                       context.pushReplacement(AppRouter.home);
+                    }
+                    if (state is AuthFailure ) {
+                      if (mounted) {
+                        setState(() => _isLoading = false);
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.error.message),
+                          backgroundColor: AppColors.danger,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                      );
                     }
                   },
                   child: AppButton(
@@ -168,8 +229,7 @@ class _SignupViewState extends State<SignupView> {
                     onPressed: _onSignupPressed,
                   ),
                 ),
-                  
-                
+
                 const SizedBox(height: 32),
 
                 // ── Login link ─────────────────────────────────────────────
@@ -178,7 +238,6 @@ class _SignupViewState extends State<SignupView> {
                     text: TextSpan(
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.textMuted,
-                    
                       ),
                       children: [
                         const TextSpan(text: 'Already have an account? '),
@@ -193,7 +252,6 @@ class _SignupViewState extends State<SignupView> {
                               'Sign In',
                               style: AppTextStyles.bodyMedium.copyWith(
                                 color: AppColors.primary,
-                               
                               ),
                             ),
                           ),

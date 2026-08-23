@@ -43,10 +43,15 @@ class AuthDataSource {
       );
       final user = credential.user!;
 
+      // Update the Auth profile so currentUser.displayName works everywhere
+      await user.updateDisplayName(name);
+      await user.reload();
+      final updatedUser = _authService.currentUser!;
+
       // Save user to Firestore
       await _userService.createUser(uid: user.uid, name: name, email: email);
 
-      return Right(user);
+      return Right(updatedUser);
     } on FirebaseAuthException catch (e) {
       return Left(_mapFirebaseError(e));
     } catch (_) {

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:sadaqa_app/core/error/app_error.dart';
 import 'package:sadaqa_app/core/services/fireStore/group_service.dart';
 import 'package:sadaqa_app/core/services/fireStore/membership_service.dart';
@@ -63,18 +64,27 @@ class GroupDataSource {
     }
   }
 
-  // Get all groups for a user
-  Future<Either<AppError, List<GroupModel>>> getUserGroups(
-    String userId,
-  ) async {
-    try {
-      final groups = await _groupService.getUserGroups(userId);
-      final models = groups.map((g) => GroupModel.fromMap(g['id'], g)).toList();
-      return Right(models);
-    } catch (_) {
-      return const Left(UnknownError());
+ // Get all groups for a user
+Future<Either<AppError, List<GroupModel>>> getUserGroups(
+  String userId,
+) async {
+  try {
+    final groups = await _groupService.getUserGroups(userId);
+    final models = groups.map((g) => GroupModel.fromMap(g['id'], g)).toList();
+    return Right(models);
+  } on FirebaseException catch (e, st) {
+    debugPrint('[getUserGroups] FirebaseException: ${e.code} → ${e.message}');
+    debugPrint('$st');
+    if (e.code == 'permission-denied') {
+      return const Left(PermissionDeniedError());
     }
+    return const Left(UnknownError());
+  } catch (e, st) {
+    debugPrint('[getUserGroups] Unknown error: $e');
+    debugPrint('$st');
+    return const Left(UnknownError());
   }
+}
 
   // Get invite link
   String getInviteLink(String groupId) {

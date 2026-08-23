@@ -38,18 +38,17 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Future<void> _onLoginPressed() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _isLoading = true);
+  if (!_formKey.currentState!.validate()) return;
+  setState(() => _isLoading = true);
 
-    await context.read<AuthCubit>().signInWithEmail(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-    );
-    await Future.delayed(const Duration(seconds: 2)); // remove when wiring cubit
+  await context.read<AuthCubit>().signInWithEmail(
+    email: _emailController.text.trim(),
+    password: _passwordController.text.trim(),
+  );
 
-    setState(() => _isLoading = false);
-    context.pushReplacement(AppRouter.home);
-  }
+  if (mounted) setState(() => _isLoading = false);
+  
+}
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +63,7 @@ class _LoginViewState extends State<LoginView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const AuthHeader(
-                  title: 'Welcome back 👋',
+                  title: 'Welcome back',
                   subtitle:
                       'Sign in to continue your sadaqa journey.',
                 ),
@@ -114,19 +113,22 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(height: 28),
 
                 // ── Login button ───────────────────────────────────────────
-                BlocListener<AuthCubit, AuthState>(
-                  listener: (context, state) {
-                    if (state is AuthAuthenticated) {
-                      context.pushReplacement(AppRouter.home);
-                    }
-                  },
-                  child: AppButton(
-                    label: 'Sign In',
-                    isLoading: _isLoading,
-                    onPressed: _onLoginPressed,
-                  
-                  ),
-                ),
+               BlocListener<AuthCubit, AuthState>(
+  listener: (context, state) {
+    if (state is AuthAuthenticated) {
+      context.pushReplacement(AppRouter.home);
+    } else if (state is AuthFailure) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(state.error.message)),
+      );
+    }
+  },
+  child: AppButton(
+    label: 'Sign In',
+    isLoading: _isLoading,
+    onPressed: _onLoginPressed,
+  ),
+),
                 const SizedBox(height: 32),
 
                 // ── Divider ────────────────────────────────────────────────

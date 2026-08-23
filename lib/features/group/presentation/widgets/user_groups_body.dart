@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sadaqa_app/core/widgets/custom_appbar.dart';
@@ -15,13 +16,14 @@ class UserGroupsViewBody extends StatefulWidget {
 }
 
 class _UserGroupsViewBodyState extends State<UserGroupsViewBody> {
-  @override
-  void initState() {
-    super.initState();
-
-    context.read<GroupCubit>().loadUserGroups('userId');
+ @override
+void initState() {
+  super.initState();
+  final userId = FirebaseAuth.instance.currentUser?.uid;
+  if (userId != null) {
+    context.read<GroupCubit>().loadUserGroups(userId);
   }
-
+}
   void _openAddGroupDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -46,3 +48,4 @@ class _UserGroupsViewBodyState extends State<UserGroupsViewBody> {
     );
   }
 }
+

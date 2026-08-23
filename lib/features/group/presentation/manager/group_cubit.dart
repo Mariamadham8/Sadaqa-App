@@ -1,4 +1,6 @@
 import 'package:bloc/bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:sadaqa_app/core/error/app_error.dart';
 import 'package:sadaqa_app/features/group/data/models/group_model.dart';
@@ -50,7 +52,7 @@ class GroupCubit extends Cubit<GroupState> {
     emit(GroupLoading());
 
     final result = await _repository.getUserGroups(userId);
-
+    debugPrint('Current user: ${FirebaseAuth.instance.currentUser?.uid}');
     result.fold(
       (error) => emit(GroupFailure(error)),
       (groups) => emit(UserGroupsLoaded(groups)),
