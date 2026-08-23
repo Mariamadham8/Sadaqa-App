@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:sadaqa_app/core/error/app_error.dart';
-import 'package:sadaqa_app/features/membership/data/data%20source/membership_ds.dart';
-import 'package:sadaqa_app/features/membership/data/models/membership_model.dart';
-import 'package:sadaqa_app/features/membership/data/repo/membership_repo.dart';
+import 'package:sadaqa_app/features/group/data/data%20source/membership_ds.dart';
+import 'package:sadaqa_app/features/group/data/models/membership_model.dart';
+import 'package:sadaqa_app/features/group/data/repo/membership%20repo/membership_repo.dart';
 
 class MembershipRepositoryImpl implements MembershipRepository {
   final MembershipDataSource _dataSource;

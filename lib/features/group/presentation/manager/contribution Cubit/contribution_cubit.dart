@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:sadaqa_app/features/monthly_donation/data/models/contribution_model.dart';
-import 'package:sadaqa_app/features/monthly_donation/data/repo/contribution_repo.dart';
+import 'package:sadaqa_app/features/group/data/models/contribution_model.dart';
+import 'package:sadaqa_app/features/group/data/repo/contribution%20repo/contribution_repo.dart';
 
 part 'contribution_state.dart';
 

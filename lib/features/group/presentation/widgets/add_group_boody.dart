@@ -1,12 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sadaqa_app/core/utils/validators.dart';
 import 'package:sadaqa_app/core/widgets/custom_button.dart';
 import 'package:sadaqa_app/core/widgets/custom_datepicker_field.dart';
 import 'package:sadaqa_app/core/widgets/custom_input_field.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_fonts.dart';
-import '../manager/group_cubit.dart';
+import '../manager/group cubit/group_cubit.dart';
 
 class AddGroupBoody extends StatefulWidget {
   const AddGroupBoody({super.key});
@@ -39,11 +40,15 @@ class _AddGroupBoodyState extends State<AddGroupBoody> {
 
   Future<void> _pickDate({required bool isStart}) async {
     final now = DateTime.now();
+    final initial = isStart
+        ? now
+        : (_endDate ?? _startDate ?? now);
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: isStart ? now : (_startDate ?? now).add(const Duration(days: 30)),
-      firstDate: now,
-      lastDate: DateTime(2030),
+      initialDate: initial,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: const ColorScheme.light(
@@ -184,8 +189,7 @@ class _AddGroupBoodyState extends State<AddGroupBoody> {
                 InputField(
                   controller: _nameCtrl,
                   hint: 'e.g. Masjid Al-Noor Fund',
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Name is required' : null,
+                  validator: FieldValidators.required('Name'),
                 ),
 
                 const SizedBox(height: 14),
@@ -206,11 +210,7 @@ class _AddGroupBoodyState extends State<AddGroupBoody> {
                   controller: _amountCtrl,
                   hint: '50',
                   keyboardType: TextInputType.number,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Amount is required';
-                    if (double.tryParse(v.trim()) == null) return 'Enter a valid number';
-                    return null;
-                  },
+                  validator: FieldValidators.amount,
                 ),
 
                 const SizedBox(height: 14),
@@ -256,6 +256,7 @@ class _AddGroupBoodyState extends State<AddGroupBoody> {
                   controller: _contactCtrl,
                   hint: 'e.g. +20 100 000 0001',
                   keyboardType: TextInputType.phone,
+                  validator: FieldValidators.phone,
                 ),
 
                 const SizedBox(height: 14),

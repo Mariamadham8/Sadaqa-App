@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:sadaqa_app/features/membership/data/models/membership_model.dart';
-import 'package:sadaqa_app/features/membership/data/repo/membership_repo.dart';
+import 'package:sadaqa_app/features/group/data/models/membership_model.dart';
+import 'package:sadaqa_app/features/group/data/repo/membership%20repo/membership_repo.dart';
 
 part 'membership_state.dart';
 

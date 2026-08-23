@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:sadaqa_app/core/error/app_error.dart';
 import 'package:sadaqa_app/features/group/data/models/group_model.dart';
-import 'package:sadaqa_app/features/group/data/repo/group-repo.dart';
+import 'package:sadaqa_app/features/group/data/repo/group%20repo/group-repo.dart';
 
 part 'group_state.dart';
 

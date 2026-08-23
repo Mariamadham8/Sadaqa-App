@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:sadaqa_app/core/error/app_error.dart';
-import 'package:sadaqa_app/features/membership/data/models/membership_model.dart';
+import 'package:sadaqa_app/features/group/data/models/membership_model.dart';
 
 abstract class MembershipRepository {
   Future<Either<AppError, Unit>> joinGroup({

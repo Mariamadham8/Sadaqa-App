@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:sadaqa_app/core/error/app_error.dart';
 import 'package:sadaqa_app/features/group/data/data%20source/group_ds.dart';
 import 'package:sadaqa_app/features/group/data/models/group_model.dart';
-import 'package:sadaqa_app/features/group/data/repo/group-repo.dart';
+import 'package:sadaqa_app/features/group/data/repo/group%20repo/group-repo.dart';
 
 class GroupRepositoryImpl implements GroupRepository {
   final GroupDataSource _dataSource;

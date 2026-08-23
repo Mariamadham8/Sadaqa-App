@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:sadaqa_app/core/error/app_error.dart';
-import 'package:sadaqa_app/features/monthly_donation/data/models/contribution_model.dart';
+import 'package:sadaqa_app/features/group/data/models/contribution_model.dart';
 
 abstract class ContributionRepository {
   Future<Either<AppError, ContributionModel?>> getUserStatus({
