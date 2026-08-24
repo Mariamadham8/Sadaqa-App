@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_fonts.dart';
 import '../../data/models/group_model.dart';
-import '../manager/group_cubit.dart';
+import '../manager/group cubit/group_cubit.dart';
 import '../widgets/group_details_body.dart';
 
 class GroupDetailsView extends StatefulWidget {

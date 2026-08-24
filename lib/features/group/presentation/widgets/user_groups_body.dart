@@ -6,7 +6,7 @@ import 'package:sadaqa_app/features/group/presentation/widgets/add_group_boody.d
 import 'package:sadaqa_app/features/group/presentation/widgets/fab_button.dart';
 import 'package:sadaqa_app/features/group/presentation/widgets/groups_listview.dart';
 import '../../../../core/utils/app_colors.dart';
-import '../manager/group_cubit.dart';
+import '../manager/group cubit/group_cubit.dart';
 
 class UserGroupsViewBody extends StatefulWidget {
   const UserGroupsViewBody({super.key});

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sadaqa_app/core/router/app_router.dart';
-import 'package:sadaqa_app/features/group/presentation/manager/group_cubit.dart';
+import 'package:sadaqa_app/features/group/presentation/manager/group%20cubit/group_cubit.dart';
+import 'package:sadaqa_app/features/group/presentation/widgets/payment_dialog.dart';
 import 'package:sadaqa_app/features/group/presentation/widgets/welcome_card.dart';
 import '../../../../core/utils/app_fonts.dart';
 import 'group_card.dart';
@@ -49,7 +50,7 @@ class GroupsListBody extends StatelessWidget {
                     onPayPressed: isPaid
                         ? null
                         : () {
-                            // TODO: handle payment navigation
+                            PaymentDialog();
                           },
                     onTap: () {
                        context.push(AppRouter.groupDetails, extra: group);

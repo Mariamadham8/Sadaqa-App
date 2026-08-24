@@ -6,7 +6,7 @@ import 'package:sadaqa_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:sadaqa_app/features/auth/presentation/views/login_view.dart';
 import 'package:sadaqa_app/features/auth/presentation/views/signup.dart';
 import 'package:sadaqa_app/features/group/data/models/group_model.dart';
-import 'package:sadaqa_app/features/group/presentation/manager/group_cubit.dart';
+import 'package:sadaqa_app/features/group/presentation/manager/group%20cubit/group_cubit.dart';
 import 'package:sadaqa_app/features/group/presentation/views/group_details_view.dart';
 import 'package:sadaqa_app/features/group/presentation/views/home_view.dart';
 
