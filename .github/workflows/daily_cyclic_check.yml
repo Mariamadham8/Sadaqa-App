@@ -17,6 +17,6 @@ jobs:
 
       - run: npm install firebase-admin
 
-      - run: node dailyCycleCheck.js
+      - run: node scripts/dailyCycleCheck.js
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
