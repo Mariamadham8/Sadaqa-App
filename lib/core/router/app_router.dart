@@ -6,7 +6,9 @@ import 'package:sadaqa_app/features/auth/presentation/manager/auth_cubit.dart';
 import 'package:sadaqa_app/features/auth/presentation/views/login_view.dart';
 import 'package:sadaqa_app/features/auth/presentation/views/signup.dart';
 import 'package:sadaqa_app/features/group/data/models/group_model.dart';
+import 'package:sadaqa_app/features/group/presentation/manager/contribution%20Cubit/contribution_cubit.dart';
 import 'package:sadaqa_app/features/group/presentation/manager/group%20cubit/group_cubit.dart';
+import 'package:sadaqa_app/features/group/presentation/manager/membership%20Cubit/membership_cubit.dart';
 import 'package:sadaqa_app/features/group/presentation/views/group_details_view.dart';
 import 'package:sadaqa_app/features/group/presentation/views/home_view.dart';
 
@@ -35,19 +37,27 @@ class AppRouter {
         create: (BuildContext context) =>get<AuthCubit>(), 
         child: SignupView())),
 
-          GoRoute(path: '/home', builder: (context, state) =>BlocProvider(create: (BuildContext context) =>get<GroupCubit>(),
-          child: UserGroupsView()) ),
+          GoRoute(path: '/home', builder: (context, state) =>MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (BuildContext context) =>get<GroupCubit>()),
+              BlocProvider(create: (BuildContext context) =>get<ContributionCubit>()),
+              BlocProvider(create: (BuildContext context) =>get<MembershipCubit>()),
+            ],
+            child: UserGroupsView(),
+          )),
 
-      
           GoRoute(
   path: '/GroupDetailsView',
   builder: (context, state) {
     return BlocProvider(
       create: (context) => get<GroupCubit>(),
-      child: GroupDetailsView(group: state.extra as GroupModel),
+      child: GroupDetailsView(group: state.extra as GroupModel),      
     );
   },
 ),
+
+
+
     ],
   );
 }

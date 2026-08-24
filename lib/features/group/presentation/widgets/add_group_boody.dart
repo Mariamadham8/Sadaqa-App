@@ -87,13 +87,22 @@ class _AddGroupBoodyState extends State<AddGroupBoody> {
       return;
     }
 
+    // displayName ممكن يرجع "" مش null، فـ ?? لوحدها مش كفاية
+    final rawDisplayName = currentUser.displayName;
+    final adminName = (rawDisplayName != null && rawDisplayName.trim().isNotEmpty)
+        ? rawDisplayName.trim()
+        : 'Unknown';
+
     context.read<GroupCubit>().createGroup(
       adminId: currentUser.uid,
-      adminName: currentUser.displayName ?? 'Unknown',
+      adminName: adminName,
       name: _nameCtrl.text.trim(),
       monthlyAmount: double.parse(_amountCtrl.text.trim()),
       startDate: _startDate!,
       endDate: _endDate!,
+      discriptoin: _descCtrl.text.trim(),
+      adminContact: _contactCtrl.text.trim(),
+      paymentMethod: _paymentCtrl.text.trim(),
     );
   }
 

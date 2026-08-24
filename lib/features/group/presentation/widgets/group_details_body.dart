@@ -12,6 +12,17 @@ class GroupDetailsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🔍 DEBUG — الداتا اللي فعلاً وصلت للـ widget من الـ extra: group
+    debugPrint('=== [GroupDetailsBody] received group ===');
+    debugPrint('name: "${group.name}"');
+    debugPrint('discriptoin: "${group.discriptoin}"');
+    debugPrint('adminName: "${group.adminName}"');
+    debugPrint('adminContact: "${group.adminContact}"');
+    debugPrint('paymentMethod: "${group.paymentMethod}"');
+    debugPrint('inviteLink: "${group.inviteLink}"');
+    debugPrint('monthlyAmount: ${group.monthlyAmount}');
+    debugPrint('endDate: ${group.endDate}');
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

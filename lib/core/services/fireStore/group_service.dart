@@ -13,21 +13,29 @@ class GroupService {
   // Create group
   Future<String> createGroup({
     required String adminId,
+    required String adminName,
     required String name,
     required double monthlyAmount,
     required DateTime startDate,
     required DateTime endDate,
+    String discriptoin = '',
+    String adminContact = '',
+    String paymentMethod = '',
   }) async {
     final ref = _groups.doc();
     final inviteLink = generateInviteLink(ref.id);
 
     await ref.set({
       'adminId': adminId,
+      'adminName': adminName,
       'name': name,
+      'discriptoin': discriptoin,
       'monthlyAmount': monthlyAmount,
       'startDate': Timestamp.fromDate(startDate),
       'endDate': Timestamp.fromDate(endDate),
       'inviteLink': inviteLink,
+      'adminContact': adminContact,
+      'paymentMethod': paymentMethod,
       'createdAt': FieldValue.serverTimestamp(),
     });
 

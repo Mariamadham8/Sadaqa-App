@@ -10,6 +10,9 @@ abstract class GroupRepository {
     required double monthlyAmount,
     required DateTime startDate,
     required DateTime endDate,
+    String discriptoin = '',
+    String adminContact = '',
+    String paymentMethod = '',
   });
 
   Future<Either<AppError, GroupModel>> getGroup(String groupId);

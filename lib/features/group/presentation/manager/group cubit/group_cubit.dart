@@ -19,6 +19,9 @@ class GroupCubit extends Cubit<GroupState> {
     required double monthlyAmount,
     required DateTime startDate,
     required DateTime endDate,
+    String discriptoin = '',
+    String adminContact = '',
+    String paymentMethod = '',
   }) async {
     emit(GroupLoading());
 
@@ -29,6 +32,9 @@ class GroupCubit extends Cubit<GroupState> {
       monthlyAmount: monthlyAmount,
       startDate: startDate,
       endDate: endDate,
+      discriptoin: discriptoin,
+      adminContact: adminContact,
+      paymentMethod: paymentMethod,
     );
 
     result.fold(
@@ -52,7 +58,7 @@ class GroupCubit extends Cubit<GroupState> {
     emit(GroupLoading());
 
     final result = await _repository.getUserGroups(userId);
-    debugPrint('Current user: ${FirebaseAuth.instance.currentUser?.uid}');
+
     result.fold(
       (error) => emit(GroupFailure(error)),
       (groups) => emit(UserGroupsLoaded(groups)),

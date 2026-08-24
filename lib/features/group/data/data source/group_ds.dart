@@ -24,14 +24,21 @@ class GroupDataSource {
     required double monthlyAmount,
     required DateTime startDate,
     required DateTime endDate,
+    String discriptoin = '',
+    String adminContact = '',
+    String paymentMethod = '',
   }) async {
     try {
       final groupId = await _groupService.createGroup(
         adminId: adminId,
+        adminName: adminName,
         name: name,
         monthlyAmount: monthlyAmount,
         startDate: startDate,
         endDate: endDate,
+        discriptoin: discriptoin,
+        adminContact: adminContact,
+        paymentMethod: paymentMethod,
       );
 
       // Add admin as first member with role 'admin'

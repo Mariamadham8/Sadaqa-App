@@ -18,6 +18,9 @@ class GroupRepositoryImpl implements GroupRepository {
     required double monthlyAmount,
     required DateTime startDate,
     required DateTime endDate,
+    String discriptoin = '',
+    String adminContact = '',
+    String paymentMethod = '',
   }) {
     return _dataSource.createGroup(
       adminId: adminId,
@@ -26,6 +29,9 @@ class GroupRepositoryImpl implements GroupRepository {
       monthlyAmount: monthlyAmount,
       startDate: startDate,
       endDate: endDate,
+      discriptoin: discriptoin,
+      adminContact: adminContact,
+      paymentMethod: paymentMethod,
     );
   }
 

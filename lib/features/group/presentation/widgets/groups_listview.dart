@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sadaqa_app/core/dependancy%20injection/di.dart';
 import 'package:sadaqa_app/core/router/app_router.dart';
+import 'package:sadaqa_app/core/utils/cyclic_utils_helper.dart';
+import 'package:sadaqa_app/features/group/presentation/manager/contribution%20Cubit/contribution_cubit.dart';
 import 'package:sadaqa_app/features/group/presentation/manager/group%20cubit/group_cubit.dart';
 import 'package:sadaqa_app/features/group/presentation/widgets/payment_dialog.dart';
 import 'package:sadaqa_app/features/group/presentation/widgets/welcome_card.dart';
@@ -26,7 +30,7 @@ class GroupsListBody extends StatelessWidget {
 
         if (state is UserGroupsLoaded) {
           final groups = state.groups;
-          const paidCount = 1; 
+          const paidCount = 1;
           final total = groups.length;
 
           return CustomScrollView(
@@ -43,17 +47,35 @@ class GroupsListBody extends StatelessWidget {
               SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final group = groups[index];
-                  final isPaid = index == 0; 
+                  final isPaid = index == 0;
                   return GroupCard(
                     group: group,
                     isPaid: isPaid,
                     onPayPressed: isPaid
                         ? null
                         : () {
-                            PaymentDialog();
+                            final cycleKey =
+                                CycleUtils.currentCycleKeyForGroup(group.startDate);
+                            if (cycleKey == null) return; 
+                           showDialog(
+  context: context,
+  builder: (dialogContext) => BlocProvider(
+    
+    create: (_) => get<ContributionCubit>()
+      ..getUserStatus(
+        userId: FirebaseAuth.instance.currentUser!.uid,
+        groupId: group.id,
+        month: cycleKey,
+      ),
+    child: PaymentDialog(
+      groupId: group.id,
+      month: cycleKey,
+    ),
+  ),
+);
                           },
                     onTap: () {
-                       context.push(AppRouter.groupDetails, extra: group);
+                      context.push(AppRouter.groupDetails, extra: group);
                     },
                   );
                 }, childCount: groups.length),
