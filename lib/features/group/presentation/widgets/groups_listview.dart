@@ -20,9 +20,6 @@ class GroupsListBody extends StatefulWidget {
 }
 
 class _GroupsListBodyState extends State<GroupsListBody> {
-
-  final Set<String> _paidGroupIds = {};
-
   Future<void> _openPaymentDialog(BuildContext context, dynamic group) async {
     final cycleKey = CycleUtils.currentCycleKeyForGroup(group.startDate);
     if (cycleKey == null) return;
@@ -36,72 +33,97 @@ class _GroupsListBodyState extends State<GroupsListBody> {
             groupId: group.id,
             month: cycleKey,
           ),
-        child: PaymentDialog(
-          groupId: group.id,
-          month: cycleKey,
-        ),
+        child: PaymentDialog(groupId: group.id, month: cycleKey),
       ),
     );
 
-    if (result == true) {
-      setState(() {
-        _paidGroupIds.add(group.id);
-      });
+    if (result == true && mounted) {
+      // رجعنا من الدفع بنجاح — نجيب الحقيقة من السيرفر تاني بدل ما نفترضها محليًا
+      final groupState = context.read<GroupCubit>().state;
+      if (groupState is UserGroupsLoaded) {
+        context.read<ContributionCubit>().getUserStatusesForGroups(
+          userId: FirebaseAuth.instance.currentUser!.uid,
+          groups: groupState.groups,
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<GroupCubit, GroupState>(
-      builder: (context, state) {
-        if (state is GroupLoading || state is GroupInitial) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (state is GroupFailure) {
-          print('Error loading groups: ${state.error.message}');
-          return Center(child: Text(state.error.message));
-        }
-
+    return BlocListener<GroupCubit, GroupState>(
+      listener: (context, state) {
         if (state is UserGroupsLoaded) {
-          final groups = state.groups;
-          final paidCount = groups.where((g) => _paidGroupIds.contains(g.id)).length;
-          final total = groups.length;
-
-          return CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: WelcomeCard(paidCount: paidCount, total: total),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 4),
-                  child: Text('Your Groups', style: AppTextStyles.headingLarge),
-                ),
-              ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final group = groups[index];
-                  final isPaid = _paidGroupIds.contains(group.id);
-                  return GroupCard(
-                    group: group,
-                    isPaid: isPaid,
-                    onPayPressed: isPaid
-                        ? null
-                        : () => _openPaymentDialog(context, group),
-                    onTap: () {
-                      context.push(AppRouter.groupDetails, extra: group);
-                    },
-                  );
-                }, childCount: groups.length),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 90)),
-            ],
+          context.read<ContributionCubit>().getUserStatusesForGroups(
+            userId: FirebaseAuth.instance.currentUser!.uid,
+            groups: state.groups,
           );
         }
-
-        return const SizedBox.shrink();
       },
+      child: BlocBuilder<GroupCubit, GroupState>(
+        builder: (context, groupState) {
+          if (groupState is GroupLoading || groupState is GroupInitial) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (groupState is GroupFailure) {
+            return Center(child: Text(groupState.error.message));
+          }
+
+          if (groupState is UserGroupsLoaded) {
+            final groups = groupState.groups;
+
+            return BlocBuilder<ContributionCubit, ContributionState>(
+              buildWhen: (previous, current) => current is UserStatusesLoaded,
+              builder: (context, contributionState) {
+                final paidStatusByGroupId = contributionState is UserStatusesLoaded
+                    ? contributionState.paidStatusByGroupId
+                    : const <String, bool>{};
+
+                final paidCount =
+                    groups.where((g) => paidStatusByGroupId[g.id] == true).length;
+                final total = groups.length;
+
+                return CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: WelcomeCard(paidCount: paidCount, total: total),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(18, 16, 18, 4),
+                        child: Text(
+                          'Your Groups',
+                          style: AppTextStyles.headingLarge,
+                        ),
+                      ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final group = groups[index];
+                        final isPaid = paidStatusByGroupId[group.id] == true;
+                        return GroupCard(
+                          group: group,
+                          isPaid: isPaid,
+                          onPayPressed: isPaid
+                              ? null
+                              : () => _openPaymentDialog(context, group),
+                          onTap: () {
+                            context.push(AppRouter.groupDetails, extra: group);
+                          },
+                        );
+                      }, childCount: groups.length),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 90)),
+                  ],
+                );
+              },
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 }

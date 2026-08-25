@@ -46,3 +46,8 @@ class ContributionFailure extends ContributionState {
 
   ContributionFailure({required this.message});
 }
+
+class UserStatusesLoaded extends ContributionState {
+  final Map<String, bool> paidStatusByGroupId;
+  UserStatusesLoaded({required this.paidStatusByGroupId});
+}

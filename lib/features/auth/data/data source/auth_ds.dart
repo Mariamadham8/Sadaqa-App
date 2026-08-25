@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:sadaqa_app/core/error/app_error.dart';
 import 'package:sadaqa_app/core/services/auth/firebase_auth_servide.dart';
 import 'package:sadaqa_app/core/services/fireStore/user_service.dart';
@@ -30,34 +31,35 @@ class AuthDataSource {
       return const Left(UnknownError());
     }
   }
+Future<Either<AppError, User>> signUpWithEmail({
+  required String email,
+  required String password,
+  required String name,
+}) async {
+  try {
+    final credential = await _authService.signUpWithEmail(
+      email: email,
+      password: password,
+    );
+    final user = credential.user!;
 
-  Future<Either<AppError, User>> signUpWithEmail({
-    required String email,
-    required String password,
-    required String name,
-  }) async {
-    try {
-      final credential = await _authService.signUpWithEmail(
-        email: email,
-        password: password,
-      );
-      final user = credential.user!;
+    await user.updateDisplayName(name);
+    await user.reload();
+    final updatedUser = _authService.currentUser!;
 
-      // Update the Auth profile so currentUser.displayName works everywhere
-      await user.updateDisplayName(name);
-      await user.reload();
-      final updatedUser = _authService.currentUser!;
+    await _userService.createUser(uid: user.uid, name: name, email: email);
 
-      // Save user to Firestore
-      await _userService.createUser(uid: user.uid, name: name, email: email);
-
-      return Right(updatedUser);
-    } on FirebaseAuthException catch (e) {
-      return Left(_mapFirebaseError(e));
-    } catch (_) {
-      return const Left(UnknownError());
-    }
+    return Right(updatedUser);
+  } on FirebaseAuthException catch (e) {
+    return Left(_mapFirebaseError(e));
+  } catch (e, stack) {
+    
+    debugPrint('SIGNUP UNEXPECTED ERROR: $e');
+    debugPrint('TYPE: ${e.runtimeType}');
+    debugPrint('STACK: $stack');
+    return const Left(UnknownError());
   }
+}
 
   Future<Either<AppError, User>> signInWithGoogle() async {
     try {

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sadaqa_app/core/utils/app_colors.dart';
 import 'package:sadaqa_app/core/utils/app_fonts.dart';
@@ -28,7 +29,7 @@ class WelcomeCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Hello, Mariem', style: AppTextStyles.displaySmall),
+                Text('${FirebaseAuth.instance.currentUser?.displayName ?? 'User'}', style: AppTextStyles.displaySmall),
                 const SizedBox(height: 4),
                 Text(
                   '$paidCount/$total groups paid this month',

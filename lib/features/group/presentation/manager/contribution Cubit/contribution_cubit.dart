@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:sadaqa_app/core/utils/cyclic_utils_helper.dart';
 import 'package:sadaqa_app/features/group/data/models/contribution_model.dart';
+import 'package:sadaqa_app/features/group/data/models/group_model.dart';
 import 'package:sadaqa_app/features/group/data/repo/contribution%20repo/contribution_repo.dart';
 
 part 'contribution_state.dart';
@@ -114,4 +116,37 @@ Future<void> updatePayment({
       (total) => emit(TotalCollectedLoaded(total: total)),
     );
   }
+
+  Future<void> getUserStatusesForGroups({
+    required String userId,
+    required List<GroupModel> groups,
+  }) async {
+    emit(ContributionLoading());
+
+    final Map<String, bool> paidStatusByGroupId = {};
+
+    for (final group in groups) {
+      final cycleKey = CycleUtils.currentCycleKeyForGroup(group.startDate);
+      if (cycleKey == null) {
+        paidStatusByGroupId[group.id] = false;
+        continue;
+      }
+
+      final result = await _repository.getUserStatus(
+        userId: userId,
+        groupId: group.id,
+        month: cycleKey,
+      );
+
+      result.fold(
+        (error) => paidStatusByGroupId[group.id] = false,
+        (contribution) =>
+            paidStatusByGroupId[group.id] = contribution?.isConfirmed ?? false,
+      );
+    }
+
+    if (isClosed) return;
+    emit(UserStatusesLoaded(paidStatusByGroupId: paidStatusByGroupId));
+  }
+
 }
