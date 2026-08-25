@@ -1,50 +1,105 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_fonts.dart';
+import '../../../../core/utils/cyclic_utils_helper.dart';
 import '../../../../core/widgets/custom_progress_par.dart';
 import '../../data/models/group_model.dart';
+import '../../data/models/membership_model.dart';
+import '../manager/contribution Cubit/contribution_cubit.dart';
+import '../manager/membership Cubit/membership_cubit.dart';
 
-class GroupDetailsBody extends StatelessWidget {
+class GroupDetailsBody extends StatefulWidget {
   const GroupDetailsBody({super.key, required this.group});
 
   final GroupModel group;
 
   @override
-  Widget build(BuildContext context) {
-    // 🔍 DEBUG — الداتا اللي فعلاً وصلت للـ widget من الـ extra: group
-    debugPrint('=== [GroupDetailsBody] received group ===');
-    debugPrint('name: "${group.name}"');
-    debugPrint('discriptoin: "${group.discriptoin}"');
-    debugPrint('adminName: "${group.adminName}"');
-    debugPrint('adminContact: "${group.adminContact}"');
-    debugPrint('paymentMethod: "${group.paymentMethod}"');
-    debugPrint('inviteLink: "${group.inviteLink}"');
-    debugPrint('monthlyAmount: ${group.monthlyAmount}');
-    debugPrint('endDate: ${group.endDate}');
+  State<GroupDetailsBody> createState() => _GroupDetailsBodyState();
+}
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _HeroSection(group: group),
-          _InfoSection(group: group),
-          _ContactPaymentSection(group: group),
-          const SizedBox(height: 32),
-        ],
-      ),
+class _GroupDetailsBodyState extends State<GroupDetailsBody> {
+  String? _cycleKey;
+
+  @override
+  void initState() {
+    super.initState();
+    _cycleKey = CycleUtils.currentCycleKeyForGroup(widget.group.startDate);
+
+    if (_cycleKey != null) {
+      context.read<ContributionCubit>().getGroupContributions(
+        groupId: widget.group.id,
+        month: _cycleKey,
+      );
+    }
+    context.read<MembershipCubit>().getGroupMembers(widget.group.id);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ContributionCubit, ContributionState>(
+      builder: (context, contributionState) {
+        return BlocBuilder<MembershipCubit, MembershipState>(
+          builder: (context, membershipState) {
+            final isLoading = contributionState is ContributionLoading ||
+                membershipState.isLoadingMembers;
+
+            if (isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (membershipState.membersError != null) {
+              return Center(child: Text(membershipState.membersError!));
+            }
+
+            final totalCollected = contributionState is GroupContributionsLoaded
+                ? contributionState.totalCollected
+                : 0.0;
+            final members = membershipState.members ?? const <MembershipModel>[];
+            final goal = widget.group.monthlyAmount * members.length;
+
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _HeroSection(
+                    group: widget.group,
+                    totalCollected: totalCollected,
+                    goal: goal,
+                    totalMembers: members.length,
+                  ),
+                  _InfoSection(group: widget.group),
+                  _ContactPaymentSection(group: widget.group),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
 
 // ── hero ──────────────────────────────────────────────────────────────────────
 class _HeroSection extends StatelessWidget {
-  const _HeroSection({required this.group});
+  const _HeroSection({
+    required this.group,
+    required this.totalCollected,
+    required this.goal,
+    required this.totalMembers,
+  });
 
   final GroupModel group;
+  final double totalCollected;
+  final double goal;
+  final int totalMembers;
 
   @override
   Widget build(BuildContext context) {
+    final progress = goal > 0 ? (totalCollected / goal).clamp(0.0, 1.0) : 0.0;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 26),
@@ -61,7 +116,6 @@ class _HeroSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // ── icon ──────────────────────────────────────
           Container(
             width: 60,
             height: 60,
@@ -89,24 +143,28 @@ class _HeroSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-
-          // ── stats row ─────────────────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _StatItem(label: 'Collected', value: '\$350'),
-              _StatDivider(),
-              _StatItem(label: 'Goal', value: '\$500'),
-              _StatDivider(),
-              _StatItem(label: 'Progress', value: '70%'),
+              _StatItem(
+                label: 'Collected',
+                value: '\$${totalCollected.toStringAsFixed(0)}',
+              ),
+              const _StatDivider(),
+              _StatItem(
+                label: 'Goal',
+                value: '\$${goal.toStringAsFixed(0)}',
+              ),
+              const _StatDivider(),
+              _StatItem(
+                label: 'Progress',
+                value: '${(progress * 100).toStringAsFixed(0)}%',
+              ),
             ],
           ),
-
           const SizedBox(height: 16),
-
-          // ── progress bar on hero ──────────────────────
           ProgressBarWidget(
-            value: 0.7,
+            value: progress,
             showLabel: false,
             showPercentage: false,
             height: 8,
@@ -149,6 +207,8 @@ class _StatItem extends StatelessWidget {
 }
 
 class _StatDivider extends StatelessWidget {
+  const _StatDivider();
+
   @override
   Widget build(BuildContext context) {
     return Container(

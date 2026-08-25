@@ -46,16 +46,19 @@ class AppRouter {
             child: UserGroupsView(),
           )),
 
-          GoRoute(
+         GoRoute(
   path: '/GroupDetailsView',
   builder: (context, state) {
-    return BlocProvider(
-      create: (context) => get<GroupCubit>(),
-      child: GroupDetailsView(group: state.extra as GroupModel),      
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => get<GroupCubit>()),
+        BlocProvider(create: (context) => get<ContributionCubit>()),
+        BlocProvider(create: (context) => get<MembershipCubit>()),
+      ],
+      child: GroupDetailsView(group: state.extra as GroupModel),
     );
   },
 ),
-
 
 
     ],

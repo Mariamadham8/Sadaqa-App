@@ -27,8 +27,7 @@ class ContributionCubit extends Cubit<ContributionState> {
       (contribution) => emit(StatusLoaded(contribution: contribution)),
     );
   }
-
-  Future<void> updatePayment({
+Future<void> updatePayment({
     required String userId,
     required String groupId,
     required double amount,
@@ -43,12 +42,30 @@ class ContributionCubit extends Cubit<ContributionState> {
       month: month,
     );
 
-    result.fold(
-      (error) => emit(ContributionFailure(message: error.message)),
-      (_) => emit(PaymentUpdated()),
+    if (isClosed) return;
+
+    await result.fold(
+      (error) async => emit(ContributionFailure(message: error.message)),
+      (_) async {
+        
+        final statusResult = await _repository.getUserStatus(
+          userId: userId,
+          groupId: groupId,
+          month: month,
+        );
+
+        if (isClosed) return;
+
+        statusResult.fold(
+          (error) => emit(ContributionFailure(message: error.message)),
+          (contribution) => emit(StatusLoaded(contribution: contribution)),
+        );
+
+        if (isClosed) return;
+        emit(PaymentUpdated());
+      },
     );
   }
-
   Future<void> getGroupContributions({
     required String groupId,
     String? month,

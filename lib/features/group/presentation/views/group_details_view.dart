@@ -1,9 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_fonts.dart';
 import '../../data/models/group_model.dart';
 import '../manager/group cubit/group_cubit.dart';
+import '../manager/membership Cubit/membership_cubit.dart';
+import '../widgets/admin_group_details_body.dart';
 import '../widgets/group_details_body.dart';
 
 class GroupDetailsView extends StatefulWidget {
@@ -20,6 +23,10 @@ class _GroupDetailsViewState extends State<GroupDetailsView> {
   void initState() {
     super.initState();
     context.read<GroupCubit>().loadGroup(widget.group.id);
+    context.read<MembershipCubit>().getUserRole(
+      userId: FirebaseAuth.instance.currentUser!.uid,
+      groupId: widget.group.id,
+    );
   }
 
   @override
@@ -28,17 +35,17 @@ class _GroupDetailsViewState extends State<GroupDetailsView> {
       backgroundColor: AppColors.background,
       appBar: _GroupDetailsAppBar(groupName: widget.group.name),
       body: BlocBuilder<GroupCubit, GroupState>(
-        builder: (context, state) {
-          if (state is GroupLoading) {
+        builder: (context, groupState) {
+          if (groupState is GroupLoading) {
             return const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
 
-          if (state is GroupFailure) {
+          if (groupState is GroupFailure) {
             return Center(
               child: Text(
-                state.error.message,
+                groupState.error.message,
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.danger,
                 ),
@@ -46,9 +53,38 @@ class _GroupDetailsViewState extends State<GroupDetailsView> {
             );
           }
 
-          // use loaded group if available, else fall back to passed group
-          final group = state is GroupLoaded ? state.group : widget.group;
-          return GroupDetailsBody(group: group);
+          final group = groupState is GroupLoaded ? groupState.group : widget.group;
+
+          return BlocBuilder<MembershipCubit, MembershipState>(
+            buildWhen: (previous, current) =>
+                previous.isLoadingRole != current.isLoadingRole ||
+                previous.role != current.role ||
+                previous.roleError != current.roleError,
+            builder: (context, membershipState) {
+              if (membershipState.isLoadingRole) {
+                return const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                );
+              }
+
+              if (membershipState.roleError != null) {
+                return Center(
+                  child: Text(
+                    membershipState.roleError!,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.danger,
+                    ),
+                  ),
+                );
+              }
+
+              final isAdmin = membershipState.role == 'admin';
+
+              return isAdmin
+                  ? AdminGroupDetailsBody(group: group)
+                  : GroupDetailsBody(group: group);
+            },
+          );
         },
       ),
     );

@@ -7,7 +7,7 @@ part 'membership_state.dart';
 
 class MembershipCubit extends Cubit<MembershipState> {
   final MembershipRepository _repository;
-  MembershipCubit(this._repository) : super(MembershipInitial());
+  MembershipCubit(this._repository) : super(const MembershipState());
 
   Future<void> joinGroup({
     required String userId,
@@ -15,7 +15,7 @@ class MembershipCubit extends Cubit<MembershipState> {
     required String userName,
     String role = 'member',
   }) async {
-    emit(MembershipLoading());
+    emit(state.copyWith(isJoining: true, joinError: null));
 
     final result = await _repository.joinGroup(
       userId: userId,
@@ -25,19 +25,19 @@ class MembershipCubit extends Cubit<MembershipState> {
     );
 
     result.fold(
-      (error) => emit(MembershipFailure(message: error.message)),
-      (_) => emit(MembershipJoined()),
+      (error) => emit(state.copyWith(isJoining: false, joinError: error.message)),
+      (_) => emit(state.copyWith(isJoining: false, joined: true)),
     );
   }
 
   Future<void> getGroupMembers(String groupId) async {
-    emit(MembershipLoading());
+    emit(state.copyWith(isLoadingMembers: true, membersError: null));
 
     final result = await _repository.getGroupMembers(groupId);
 
     result.fold(
-      (error) => emit(MembershipFailure(message: error.message)),
-      (members) => emit(MembersLoaded(members: members)),
+      (error) => emit(state.copyWith(isLoadingMembers: false, membersError: error.message)),
+      (members) => emit(state.copyWith(isLoadingMembers: false, members: members)),
     );
   }
 
@@ -45,7 +45,7 @@ class MembershipCubit extends Cubit<MembershipState> {
     required String userId,
     required String groupId,
   }) async {
-    emit(MembershipLoading());
+    emit(state.copyWith(isCheckingMembership: true, checkError: null));
 
     final result = await _repository.checkIsMember(
       userId: userId,
@@ -53,8 +53,25 @@ class MembershipCubit extends Cubit<MembershipState> {
     );
 
     result.fold(
-      (error) => emit(MembershipFailure(message: error.message)),
-      (isMember) => emit(MembershipChecked(isMember: isMember)),
+      (error) => emit(state.copyWith(isCheckingMembership: false, checkError: error.message)),
+      (isMember) => emit(state.copyWith(isCheckingMembership: false, isMember: isMember)),
+    );
+  }
+
+  Future<void> getUserRole({
+    required String userId,
+    required String groupId,
+  }) async {
+    emit(state.copyWith(isLoadingRole: true, roleError: null));
+
+    final result = await _repository.getUserRole(
+      userId: userId,
+      groupId: groupId,
+    );
+
+    result.fold(
+      (error) => emit(state.copyWith(isLoadingRole: false, roleError: error.message)),
+      (role) => emit(state.copyWith(isLoadingRole: false, role: role)),
     );
   }
 }

@@ -12,8 +12,43 @@ import 'package:sadaqa_app/features/group/presentation/widgets/welcome_card.dart
 import '../../../../core/utils/app_fonts.dart';
 import 'group_card.dart';
 
-class GroupsListBody extends StatelessWidget {
+class GroupsListBody extends StatefulWidget {
   const GroupsListBody({super.key});
+
+  @override
+  State<GroupsListBody> createState() => _GroupsListBodyState();
+}
+
+class _GroupsListBodyState extends State<GroupsListBody> {
+
+  final Set<String> _paidGroupIds = {};
+
+  Future<void> _openPaymentDialog(BuildContext context, dynamic group) async {
+    final cycleKey = CycleUtils.currentCycleKeyForGroup(group.startDate);
+    if (cycleKey == null) return;
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => BlocProvider(
+        create: (_) => get<ContributionCubit>()
+          ..getUserStatus(
+            userId: FirebaseAuth.instance.currentUser!.uid,
+            groupId: group.id,
+            month: cycleKey,
+          ),
+        child: PaymentDialog(
+          groupId: group.id,
+          month: cycleKey,
+        ),
+      ),
+    );
+
+    if (result == true) {
+      setState(() {
+        _paidGroupIds.add(group.id);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +65,7 @@ class GroupsListBody extends StatelessWidget {
 
         if (state is UserGroupsLoaded) {
           final groups = state.groups;
-          const paidCount = 1;
+          final paidCount = groups.where((g) => _paidGroupIds.contains(g.id)).length;
           final total = groups.length;
 
           return CustomScrollView(
@@ -47,33 +82,13 @@ class GroupsListBody extends StatelessWidget {
               SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final group = groups[index];
-                  final isPaid = index == 0;
+                  final isPaid = _paidGroupIds.contains(group.id);
                   return GroupCard(
                     group: group,
                     isPaid: isPaid,
                     onPayPressed: isPaid
                         ? null
-                        : () {
-                            final cycleKey =
-                                CycleUtils.currentCycleKeyForGroup(group.startDate);
-                            if (cycleKey == null) return; 
-                           showDialog(
-  context: context,
-  builder: (dialogContext) => BlocProvider(
-    
-    create: (_) => get<ContributionCubit>()
-      ..getUserStatus(
-        userId: FirebaseAuth.instance.currentUser!.uid,
-        groupId: group.id,
-        month: cycleKey,
-      ),
-    child: PaymentDialog(
-      groupId: group.id,
-      month: cycleKey,
-    ),
-  ),
-);
-                          },
+                        : () => _openPaymentDialog(context, group),
                     onTap: () {
                       context.push(AppRouter.groupDetails, extra: group);
                     },
