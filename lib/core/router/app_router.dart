@@ -34,7 +34,7 @@ class AppRouter {
 
           GoRoute(path: '/home', builder: (context, state) =>MultiBlocProvider(
             providers: [
-              BlocProvider(create: (BuildContext context) =>get<GroupCubit>()),
+              BlocProvider.value(value: get<GroupCubit>()),
               BlocProvider(create: (BuildContext context) =>get<ContributionCubit>()),
               BlocProvider(create: (BuildContext context) =>get<MembershipCubit>()),
             ],
@@ -46,7 +46,7 @@ class AppRouter {
   builder: (context, state) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => get<GroupCubit>()),
+        BlocProvider.value(value: get<GroupCubit>()), 
         BlocProvider(create: (context) => get<ContributionCubit>()),
         BlocProvider(create: (context) => get<MembershipCubit>()),
       ],
