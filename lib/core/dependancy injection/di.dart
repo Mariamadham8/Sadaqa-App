@@ -21,6 +21,7 @@ import 'package:sadaqa_app/features/group/data/data%20source/contribution_ds.dar
 import 'package:sadaqa_app/features/group/data/repo/contribution%20repo/contribution-repo_impl.dart';
 import 'package:sadaqa_app/features/group/data/repo/contribution%20repo/contribution_repo.dart';
 import 'package:sadaqa_app/features/group/presentation/manager/contribution%20Cubit/contribution_cubit.dart';
+import 'package:sadaqa_app/features/group/presentation/widgets/deep_link_service.dart';
 
 GetIt get = GetIt.instance;
 
@@ -31,7 +32,7 @@ void setupLocator() {
   get.registerLazySingleton(() => GroupService());
   get.registerLazySingleton(() => MembershipService());
   get.registerLazySingleton(() => ContributionService());
-  get.registerLazySingleton(() => LocalNotificationService());
+  //get.registerLazySingleton(() => LocalNotificationService());
 
   // ─── Data Sources ────────────────────────────────────────
   get.registerLazySingleton(
@@ -66,4 +67,6 @@ void setupLocator() {
   get.registerFactory(() => GroupCubit(get()));
   get.registerFactory(() => MembershipCubit(get()));
   get.registerFactory(() => ContributionCubit(get()));
+
+  get.registerLazySingleton<DeepLinkService>(() => DeepLinkService());
 }

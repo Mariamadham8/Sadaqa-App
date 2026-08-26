@@ -18,24 +18,19 @@ class AppRouter {
   static const kSignupview = '/signup';
   static const home = '/home';
   static const groupDetails = '/GroupDetailsView';
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   final GoRouter router = GoRouter(
+    navigatorKey: navigatorKey,
     routes: [
-       GoRoute(path: '/', builder: (context, state) => BlocProvider(
-        create: (BuildContext context) =>get<AuthCubit>(), 
-        child: SignupView())),
+       GoRoute(path: '/', builder: (context, state) => SignupView()),
         GoRoute(path: '/spalsh', builder: (context, state) => Center()),
        GoRoute
        (
         path: '/login', 
-       builder: (context, state) => BlocProvider
-       (
-        create: (BuildContext context) =>get<AuthCubit>(),     
-       child: LoginView())
+       builder: (context, state) => LoginView()
        ),
      
-      GoRoute(path: '/signup', builder: (context, state) => BlocProvider(
-        create: (BuildContext context) =>get<AuthCubit>(), 
-        child: SignupView())),
+      GoRoute(path: '/signup', builder: (context, state) => SignupView()),
 
           GoRoute(path: '/home', builder: (context, state) =>MultiBlocProvider(
             providers: [
