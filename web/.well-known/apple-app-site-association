@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "ضيفي هنا TEAM_ID.com.example.sadaqa_app",
+        "paths": ["*"]
+      }
+    ]
+  }
+}

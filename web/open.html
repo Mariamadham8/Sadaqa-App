@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>جاري فتح التطبيق...</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 60px;
+    }
+    button {
+      padding: 14px 28px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background: #1DB954;
+      color: white;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>جاري تحويلك للتطبيق...</h2>
+  <p>لو مفتحش تلقائيًا، دوسي الزرار:</p>
+  <button onclick="openApp()">افتحي في التطبيق</button>
+
+  <script>
+    // اقرأي الـ path من رابط الصفحة نفسها، مثال: ?path=invite/123
+    const params = new URLSearchParams(window.location.search);
+    const path = params.get('path') || '';
+
+    function openApp() {
+      window.location.href = 'sadaqaapp://' + path;
+    }
+
+    // حاولي تفتحي التطبيق تلقائيًا
+    openApp();
+
+    // لو بعد ثانيتين لسه في نفس الصفحة، يبقى التطبيق مش متسطب
+    // وديها على الـ store المناسب حسب نوع الجهاز
+    setTimeout(function () {
+      const ua = navigator.userAgent || navigator.vendor;
+      if (/android/i.test(ua)) {
+        window.location.href = 'https://play.google.com/store/apps/details?id=com.example.sadaqa_app';
+      } else if (/iPad|iPhone|iPod/.test(ua)) {
+        window.location.href = 'https://apps.apple.com/app/idXXXXXXXXX'; // حطي الـ App Store ID لما يبقى عندك
+      }
+    }, 2000);
+  </script>
+</body>
+</html>

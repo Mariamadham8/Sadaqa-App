@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.example.sadaqa_app",
+      "sha256_cert_fingerprints": [
+        "E6:B6:CF:31:2E:4C:D7:0A:27:79:50:FE:68:42:39:78:FC:9B:2B:7C:7A:AD:9A:1F:C6:E1:55:B7:9C:05:FD:11"
+      ]
+    }
+  }
+]
