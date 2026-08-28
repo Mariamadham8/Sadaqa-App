@@ -99,6 +99,7 @@ class _JoinGroupDialogState extends State<JoinGroupDialog> {
     if (_loadError != null) {
       return Text('The group is not available: $_loadError');
     }
+
     return Text('Do you want to join the group "${_group!.name}"？');
   }
 

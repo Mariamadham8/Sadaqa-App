@@ -12,28 +12,27 @@ class DeepLinkService {
   String? get pendingGroupId => _pendingGroupId;
 
   Future<void> init() async {
-    // 1) لو التطبيق كان مقفول تمامًا واتفتح عن طريق اللينك
     final initialUri = await _appLinks.getInitialLink();
-    if (initialUri != null) _handleUri(initialUri);
+    if (initialUri != null) handleUri(initialUri);
 
-    // 2) لو التطبيق شغال بالفعل (foreground/background) واللينك جه
-    _linkSub = _appLinks.uriLinkStream.listen(_handleUri);
+    _linkSub = _appLinks.uriLinkStream.listen(handleUri);
   }
 
-  void _handleUri(Uri uri) {
-  print('DeepLink received: $uri'); 
-  if (uri.host == 'join') {
+  /// عامة دلوقتي عشان go_router يقدر ينادّيها مباشرة من الـ redirect
+  /// بيدعم الشكلين: custom scheme (host == join) و https (path == /join)
+  void handleUri(Uri uri) {
+    print('DeepLink received: $uri');
+    final isJoinLink = uri.host == 'join' || uri.path == '/join';
+    if (!isJoinLink) return;
+
     final groupId = uri.queryParameters['groupId'];
-    print('groupId: $groupId'); 
+    print('groupId: $groupId');
     if (groupId != null && groupId.isNotEmpty) {
       _pendingGroupId = groupId;
       _pendingGroupIdController.add(groupId);
     }
   }
-}
 
-  /// تتنادى بعد ما اليوزر يقفل الديالوج (join أو cancel)، عشان منفضلش
-  /// نعرض نفس الدعوة تاني كل مرة الشاشة تتبني.
   void clearPendingGroupId() {
     _pendingGroupId = null;
     _pendingGroupIdController.add(null);

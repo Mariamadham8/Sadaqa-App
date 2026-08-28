@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>جاري فتح التطبيق...</title>
+</head>
+<body>
+  <h2>جاري تحويلك للتطبيق...</h2>
+  <button onclick="openApp()">افتحي في التطبيق</button>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const groupId = params.get('groupId') || '';
+
+    function openApp() {
+      window.location.href = 'sadaqaapp://join?groupId=' + groupId;
+    }
+
+    openApp();
+
+    setTimeout(function () {
+      const ua = navigator.userAgent || navigator.vendor;
+      if (/android/i.test(ua)) {
+        window.location.href = 'https://play.google.com/store/apps/details?id=com.example.sadaqa_app';
+      } else if (/iPad|iPhone|iPod/.test(ua)) {
+        window.location.href = 'https://apps.apple.com/app/idXXXXXXXXX';
+      }
+    }, 2000);
+  </script>
+</body>
+</html>

@@ -11,6 +11,7 @@ import 'package:sadaqa_app/features/group/presentation/manager/group%20cubit/gro
 import 'package:sadaqa_app/features/group/presentation/manager/membership%20Cubit/membership_cubit.dart';
 import 'package:sadaqa_app/features/group/presentation/views/group_details_view.dart';
 import 'package:sadaqa_app/features/group/presentation/views/home_view.dart';
+import 'package:sadaqa_app/features/group/presentation/widgets/deep_link_service.dart';
 
 class AppRouter {
   static const kSpalshview = '/spalsh';
@@ -52,6 +53,19 @@ class AppRouter {
       ],
       child: GroupDetailsView(group: state.extra as GroupModel),
     );
+  },
+),
+
+GoRoute(
+  path: '/join',
+  redirect: (context, state) {
+    final groupId = state.uri.queryParameters['groupId'];
+    if (groupId != null && groupId.isNotEmpty) {
+      get<DeepLinkService>().handleUri(
+        Uri(path: '/join', queryParameters: {'groupId': groupId}),
+      );
+    }
+    return AppRouter.home;
   },
 ),
 

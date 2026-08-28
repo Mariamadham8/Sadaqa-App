@@ -4,11 +4,14 @@ class GroupService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   CollectionReference get _groups => _db.collection('groups');
+   static const String _baseUrl = 'https://sadaqaapp-9f09c.web.app';
 
+  
   // Generate invite link from groupId
   String generateInviteLink(String groupId) {
-    return 'sadaqaapp://join?groupId=$groupId';
+    return '$_baseUrl/join?groupId=$groupId';
   }
+
 
   // Create group
   Future<String> createGroup({
