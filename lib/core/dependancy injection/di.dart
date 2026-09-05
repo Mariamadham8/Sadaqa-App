@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:sadaqa_app/core/services/auth/firebase_auth_servide.dart';
 import 'package:sadaqa_app/core/services/fcm%20service/local_notification_service.dart';
+import 'package:sadaqa_app/core/services/fcm%20service/onsignal_notfication_service.dart';
 import 'package:sadaqa_app/core/services/fireStore/user_service.dart';
 import 'package:sadaqa_app/core/services/fireStore/group_service.dart';
 import 'package:sadaqa_app/core/services/fireStore/membership_service.dart';
@@ -69,4 +70,12 @@ void setupLocator() {
   get.registerFactory(() => ContributionCubit(get()));
 
   get.registerLazySingleton<DeepLinkService>(() => DeepLinkService());
+
+/*
+  get.registerLazySingleton(() => LocalNotificationService());
+get.registerLazySingleton(
+  () => OneSignalService(userService: get(), localNotifications: get()),
+);
+*/
+
 }
