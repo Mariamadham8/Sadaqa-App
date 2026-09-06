@@ -1,0 +1,41 @@
+name: Flutter CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) بتنزل الكود بتاعك على الجهاز الافتراضي (لازم دايمًا أول خطوة)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2) بتظبط Flutter SDK على الجهاز عشان تقدري تستخدمي أوامره
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.0'   # حطي نفس النسخة اللي شغالة عندك محليًا
+          channel: 'stable'
+
+      # 3) بتجيب كل الـ packages من pubspec.yaml (زي flutter pub get عندك)
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 4) (اختياري بس مفيد) بتشغل التستات بتاعتك قبل ما تعملي build
+      - name: Run tests
+        run: flutter test
+
+      # 5) بتبني الـ APK فعليًا
+      - name: Build APK
+        run: flutter build apk --release
+
+      # 6) بترفع الـ APK كـ artifact عشان تقدري تنزليه من صفحة الـ Actions
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
