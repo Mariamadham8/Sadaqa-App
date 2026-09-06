@@ -18,8 +18,8 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.0'   # حطي نفس النسخة اللي شغالة عندك محليًا
-          channel: 'stable'
+          flutter-version: "3.44.1" # نفس النسخة الشغالة محليًا (Dart 3.12.1)
+          channel: "stable"
 
       # 3) بتجيب كل الـ packages من pubspec.yaml (زي flutter pub get عندك)
       - name: Install dependencies
