@@ -12,6 +12,7 @@ import 'package:sadaqa_app/features/group/presentation/manager/membership%20Cubi
 import 'package:sadaqa_app/features/group/presentation/views/group_details_view.dart';
 import 'package:sadaqa_app/features/group/presentation/views/home_view.dart';
 import 'package:sadaqa_app/features/group/presentation/widgets/deep_link_service.dart';
+import 'package:sadaqa_app/features/splash/presentation/views/spash_screen_view.dart';
 
 class AppRouter {
   static const kSpalshview = '/spalsh';
@@ -19,57 +20,59 @@ class AppRouter {
   static const kSignupview = '/signup';
   static const home = '/home';
   static const groupDetails = '/GroupDetailsView';
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
   final GoRouter router = GoRouter(
     navigatorKey: navigatorKey,
     routes: [
-       GoRoute(path: '/', builder: (context, state) => SignupView()),
-        GoRoute(path: '/spalsh', builder: (context, state) => Center()),
-       GoRoute
-       (
-        path: '/login', 
-       builder: (context, state) => LoginView()
-       ),
-     
+      GoRoute(path: '/', builder: (context, state) => SplashScreenView()),
+      GoRoute(path: '/spalsh', builder: (context, state) => SplashScreenView()),
+      GoRoute(path: '/login', builder: (context, state) => LoginView()),
+
       GoRoute(path: '/signup', builder: (context, state) => SignupView()),
 
-          GoRoute(path: '/home', builder: (context, state) =>MultiBlocProvider(
+      GoRoute(
+        path: '/home',
+        builder: (context, state) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: get<GroupCubit>()),
+            BlocProvider(
+              create: (BuildContext context) => get<ContributionCubit>(),
+            ),
+            BlocProvider(
+              create: (BuildContext context) => get<MembershipCubit>(),
+            ),
+          ],
+          child: UserGroupsView(),
+        ),
+      ),
+
+      GoRoute(
+        path: '/GroupDetailsView',
+        builder: (context, state) {
+          return MultiBlocProvider(
             providers: [
               BlocProvider.value(value: get<GroupCubit>()),
-              BlocProvider(create: (BuildContext context) =>get<ContributionCubit>()),
-              BlocProvider(create: (BuildContext context) =>get<MembershipCubit>()),
+              BlocProvider(create: (context) => get<ContributionCubit>()),
+              BlocProvider(create: (context) => get<MembershipCubit>()),
             ],
-            child: UserGroupsView(),
-          )),
+            child: GroupDetailsView(group: state.extra as GroupModel),
+          );
+        },
+      ),
 
-         GoRoute(
-  path: '/GroupDetailsView',
-  builder: (context, state) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: get<GroupCubit>()), 
-        BlocProvider(create: (context) => get<ContributionCubit>()),
-        BlocProvider(create: (context) => get<MembershipCubit>()),
-      ],
-      child: GroupDetailsView(group: state.extra as GroupModel),
-    );
-  },
-),
-
-GoRoute(
-  path: '/join',
-  redirect: (context, state) {
-    final groupId = state.uri.queryParameters['groupId'];
-    if (groupId != null && groupId.isNotEmpty) {
-      get<DeepLinkService>().handleUri(
-        Uri(path: '/join', queryParameters: {'groupId': groupId}),
-      );
-    }
-    return AppRouter.home;
-  },
-),
-
-
+      GoRoute(
+        path: '/join',
+        redirect: (context, state) {
+          final groupId = state.uri.queryParameters['groupId'];
+          if (groupId != null && groupId.isNotEmpty) {
+            get<DeepLinkService>().handleUri(
+              Uri(path: '/join', queryParameters: {'groupId': groupId}),
+            );
+          }
+          return AppRouter.home;
+        },
+      ),
     ],
   );
 }
